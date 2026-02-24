@@ -1,0 +1,33 @@
+{% load helpers %}
+
+<div class="card">
+  <h5 class="card-header">
+    <i class="mdi mdi-key-chain"></i> SSH Keys
+  </h5>
+  {% if ssh_keys %}
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Fingerprint</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for key in ssh_keys %}
+        <tr>
+          <td><a href="{{ key.get_absolute_url }}">{{ key.name }}</a></td>
+          <td>{{ key.get_key_type_display }}</td>
+          <td><code>{{ key.fingerprint }}</code></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="card-body text-muted">
+    No SSH keys assigned to this tenant.
+  </div>
+  {% endif %}
+</div>

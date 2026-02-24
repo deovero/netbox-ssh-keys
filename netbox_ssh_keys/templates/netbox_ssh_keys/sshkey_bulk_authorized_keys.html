@@ -1,0 +1,52 @@
+{% extends 'base/layout.html' %}
+{% load helpers %}
+
+{% block title %}Bulk Import SSH Keys (authorized_keys){% endblock %}
+
+{% block tabs %}
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" href="{% url 'plugins:netbox_ssh_keys:sshkey_bulk_authorized_keys' %}">
+      Bulk Import
+    </a>
+  </li>
+</ul>
+{% endblock tabs %}
+
+{% block content %}
+<div class="row">
+  <div class="col col-md-12">
+    <div class="card">
+      <h5 class="card-header">Paste authorized_keys Content</h5>
+      <div class="card-body">
+        <p class="text-muted">
+          Paste one or more SSH public key lines (the same format as <code>~/.ssh/authorized_keys</code>).
+          Each line should be: <code>key-type base64-key [comment]</code>.
+          Empty lines and lines starting with <code>#</code> are skipped.
+        </p>
+        <form method="post">
+          {% csrf_token %}
+          {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+              <div class="form-text text-muted">{{ field.help_text }}</div>
+            {% endif %}
+            {% for error in field.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          {% endfor %}
+          <div class="text-end">
+            <a href="{% url 'plugins:netbox_ssh_keys:sshkey_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+              <i class="mdi mdi-upload"></i> Import Keys
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

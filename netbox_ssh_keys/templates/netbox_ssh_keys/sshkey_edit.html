@@ -1,0 +1,7 @@
+{% extends 'generic/object_edit.html' %}
+{% load static %}
+
+{% block javascript %}
+  {{ block.super }}
+  <script type="text/javascript" src="{% static 'netbox_ssh_keys/js/sshkey_paste.js' %}"></script>
+{% endblock javascript %}

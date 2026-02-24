@@ -1,0 +1,58 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}\n{% load plugins %}
+
+{% block breadcrumbs %}
+  {{ block.super }}
+  <li class="breadcrumb-item">
+    <a href="{% url 'plugins:netbox_ssh_keys:sshkey_list' %}">SSH Keys</a>
+  </li>
+{% endblock breadcrumbs %}
+
+{% block content %}
+<div class="row mb-3">
+  <div class="col col-md-6">
+    <div class="card">
+      <h5 class="card-header">SSH Key</h5>
+      <table class="table table-hover attr-table">
+        <tr>
+          <th scope="row">Name</th>
+          <td>{{ object.name }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Key Type</th>
+          <td>{{ object.get_key_type_display }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Fingerprint</th>
+          <td><code>{{ object.fingerprint }}</code></td>
+        </tr>
+        <tr>
+          <th scope="row">Tenant</th>
+          <td>
+            {% if object.tenant %}
+              <a href="{{ object.tenant.get_absolute_url }}">{{ object.tenant }}</a>
+            {% else %}
+              {{ ''|placeholder }}
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Description</th>
+          <td>{{ object.description|placeholder }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="col col-md-6">
+    <div class="card">
+      <h5 class="card-header">Public Key</h5>
+      <div class="card-body">
+        <pre class="mb-0" style="white-space: pre-wrap; word-break: break-all;"><code>{{ object.authorized_keys_line }}</code></pre>
+      </div>
+    </div>
+    {% include 'inc/panels/tags.html' %}
+    {% include 'inc/panels/custom_fields.html' %}
+  </div>
+</div>
+
+{% endblock content %}
