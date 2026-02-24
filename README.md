@@ -22,7 +22,7 @@ A [NetBox](https://github.com/netbox-community/netbox) plugin for managing SSH p
 ## Installation
 
 ```bash
-pip install netbox-ssh-keys
+pip install git+https://github.com/deovero/netbox-ssh-keys.git
 ```
 
 Add to NetBox `configuration.py`:
