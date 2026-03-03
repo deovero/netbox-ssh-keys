@@ -12,8 +12,7 @@ class SSHKey(NetBoxModel):
 
     name = models.CharField(
         max_length=256,
-        unique=True,
-        help_text='A unique friendly name for this key',
+        help_text='A friendly name for this key',
     )
     key_type = models.CharField(
         max_length=64,
@@ -26,7 +25,6 @@ class SSHKey(NetBoxModel):
     )
     fingerprint = models.CharField(
         max_length=128,
-        unique=True,
         editable=False,
         help_text='SHA256 fingerprint (auto-calculated)',
     )
@@ -48,6 +46,12 @@ class SSHKey(NetBoxModel):
         ordering = ['name']
         verbose_name = 'SSH key'
         verbose_name_plural = 'SSH keys'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['fingerprint', 'tenant'],
+                name='unique_fingerprint_per_tenant',
+            ),
+        ]
 
     def __str__(self):
         return self.name
