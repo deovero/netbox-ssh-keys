@@ -20,7 +20,8 @@ class SSHKey(NetBoxModel):
         choices=SSHKeyTypeChoices,
         help_text='SSH key algorithm type',
     )
-    public_key = models.TextField(
+    public_key = models.CharField(
+        max_length=1023,
         help_text='Base64-encoded public key material (without type prefix or comment)',
     )
     fingerprint = models.CharField(

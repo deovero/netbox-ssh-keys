@@ -4,13 +4,11 @@ A [NetBox](https://github.com/netbox-community/netbox) plugin for managing SSH p
 
 ## Features
 
-- **SSH Key Management** — Store and manage SSH public keys with type, key material, comment, and auto-calculated SHA256 fingerprint
+- **SSH Key Management** — Store and manage SSH public keys with type, key material, and auto-calculated SHA256 fingerprint
 - **Tenant Association** — Assign SSH keys to tenants (customers)
-- **Device/VM Assignment** — Assign keys to devices and virtual machines via generic foreign keys
 - **REST API** — Full CRUD operations via NetBox's REST API
-- **GraphQL** — Query SSH keys via NetBox's built-in GraphQL API
+- **GraphQL** — Query and filter SSH keys (by name, key type, public key, fingerprint, tenant) via NetBox's GraphQL API
 - **Bulk Import** — Paste `authorized_keys` content to import multiple keys at once
-- **Template Extensions** — SSH keys panel on Tenant, Device, and VM detail pages
 - **Search** — SSH keys indexed in NetBox's global search
 
 ## Compatibility
@@ -42,28 +40,20 @@ python manage.py migrate netbox_ssh_keys
 
 ### SSHKey
 
-| Field         | Type       | Description                                      |
-|---------------|------------|--------------------------------------------------|
-| `name`        | CharField  | Unique friendly name for the key                 |
-| `key_type`    | CharField  | Algorithm (ssh-rsa, ssh-ed25519, ecdsa-*, sk-*)  |
-| `public_key`  | TextField  | Base64-encoded public key material               |
-| `comment`     | CharField  | Optional comment (e.g., user@host)               |
-| `fingerprint` | CharField  | SHA256 fingerprint (auto-calculated, unique)      |
-| `tenant`      | ForeignKey | Optional FK to Tenant                            |
-| `description` | CharField  | Optional description                             |
+| Field         | Type       | Max Length | Description                                      |
+|---------------|------------|------------|--------------------------------------------------|
+| `name`        | CharField  | 256        | Unique friendly name for the key                 |
+| `key_type`    | CharField  | 64         | Algorithm (ssh-rsa, ssh-ed25519, ecdsa-*, sk-*)  |
+| `public_key`  | CharField  | 1023       | Base64-encoded public key material               |
+| `fingerprint` | CharField  | 128        | SHA256 fingerprint (auto-calculated, unique)      |
+| `tenant`      | ForeignKey | —          | Optional FK to Tenant                            |
+| `description` | CharField  | 200        | Optional description                             |
 
 Plus tags and custom fields via `NetBoxModel`.
 
-### SSHKeyAssignment
-
-| Field                  | Type              | Description                          |
-|------------------------|-------------------|--------------------------------------|
-| `ssh_key`              | ForeignKey        | FK to SSHKey                         |
-| `assigned_object_type` | ForeignKey (CT)   | ContentType of the assigned object   |
-| `assigned_object_id`   | PositiveBigInt    | PK of the assigned object            |
-| `assigned_object`      | GenericForeignKey  | Device or VirtualMachine             |
-
-Plus tags and custom fields via `NetBoxModel`.
+> **Note:** The `public_key` field stores only the base64-encoded key material (without the type prefix or comment).
+> The 1023-character limit comfortably accommodates RSA-4096 (≈716 chars), ECDSA (≈140–232 chars),
+> and Ed25519 (≈68 chars) keys. RSA-8192 keys (≈1392 chars) are **not** supported.
 
 ## Development
 

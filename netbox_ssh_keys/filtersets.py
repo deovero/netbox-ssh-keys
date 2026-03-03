@@ -26,9 +26,13 @@ class SSHKeyFilterSet(NetBoxModelFilterSet):
         label='Tenant (slug)',
     )
 
+    public_key = django_filters.CharFilter(
+        lookup_expr='exact',
+    )
+
     class Meta:
         model = SSHKey
-        fields = ['id', 'name', 'key_type', 'fingerprint', 'tenant_id']
+        fields = ['id', 'name', 'key_type', 'public_key', 'fingerprint', 'tenant_id']
 
     def search(self, queryset, name, value):
         if not value.strip():

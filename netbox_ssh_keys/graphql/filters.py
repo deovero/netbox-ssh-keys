@@ -21,6 +21,7 @@ __all__ = (
 class SSHKeyFilter(NetBoxModelFilter):
     name: FilterLookup[str] | None = strawberry_django.filter_field()
     key_type: FilterLookup[str] | None = strawberry_django.filter_field()
+    public_key: FilterLookup[str] | None = strawberry_django.filter_field()
     fingerprint: FilterLookup[str] | None = strawberry_django.filter_field()
     tenant: Annotated['TenantFilter', strawberry.lazy('tenancy.graphql.filters')] | None = (
         strawberry_django.filter_field()
