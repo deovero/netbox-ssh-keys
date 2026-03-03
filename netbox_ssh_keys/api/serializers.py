@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
+from tenancy.api.serializers_.tenants import TenantSerializer
 
 from ..models import SSHKey
 
@@ -10,6 +11,7 @@ class SSHKeySerializer(NetBoxModelSerializer):
         view_name='plugins-api:netbox_ssh_keys-api:sshkey-detail',
     )
     authorized_keys_line = serializers.CharField(read_only=True)
+    tenant = TenantSerializer(required=False, allow_null=True, nested=True)
 
     class Meta:
         model = SSHKey
