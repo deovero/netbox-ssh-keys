@@ -19,4 +19,4 @@ class SSHKeySerializer(NetBoxModelSerializer):
             'authorized_keys_line',
             'tags', 'custom_fields', 'created', 'last_updated',
         ]
-        brief_fields = ['id', 'url', 'display', 'name', 'fingerprint', 'key_type']
+        brief_fields = ['id', 'url', 'display', 'name', 'public_key', 'fingerprint', 'key_type']
