@@ -42,14 +42,36 @@ python manage.py migrate netbox_ssh_keys
 
 | Field         | Type       | Max Length | Description                                      |
 |---------------|------------|------------|--------------------------------------------------|
-| `name`        | CharField  | 256        | Unique friendly name for the key                 |
-| `key_type`    | CharField  | 64         | Algorithm (ssh-rsa, ssh-ed25519, ecdsa-*, sk-*)  |
+| `name`        | CharField  | 256        | Friendly name for the key                        |
+| `key_type`    | CharField  | 64         | Algorithm (ssh-rsa, ssh-ed25519, ecdsa-\*, sk-\*)|
 | `public_key`  | CharField  | 1023       | Base64-encoded public key material               |
-| `fingerprint` | CharField  | 128        | SHA256 fingerprint (auto-calculated, unique)      |
+| `fingerprint` | CharField  | 128        | SHA256 fingerprint (auto-calculated)             |
 | `tenant`      | ForeignKey | —          | Optional FK to Tenant                            |
 | `description` | CharField  | 200        | Optional description                             |
 
 Plus tags and custom fields via `NetBoxModel`.
+
+### Uniqueness
+
+- `fingerprint` + `tenant` — unique together. The same key material can exist under different tenants, but not twice under the same tenant.
+- `name` — not unique. Multiple keys (even across tenants) may share the same name.
+
+### API Filtering
+
+SSH keys can be filtered via the REST API using the following query parameters:
+
+| Parameter     | Type   | Description                          |
+|---------------|--------|--------------------------------------|
+| `public_key`  | string | Exact match on base64 key material   |
+| `fingerprint` | string | Exact match on SHA256 fingerprint    |
+| `key_type`    | string | Filter by algorithm type             |
+| `tenant`      | slug   | Filter by tenant slug                |
+| `tenant_id`   | int    | Filter by tenant ID                  |
+| `name`        | string | Filter by name                       |
+
+### Multi-object Custom Fields
+
+The `public_key` field is included in `brief_fields`, allowing SSH keys to be referenced in multi-object custom fields using `{"public_key": "<base64>"}` — similar to how IPAM prefixes use `{"prefix": "<cidr>"}`.
 
 > **Note:** The `public_key` field stores only the base64-encoded key material (without the type prefix or comment).
 > The 1023-character limit comfortably accommodates RSA-4096 (≈716 chars), ECDSA (≈140–232 chars),
