@@ -3,7 +3,7 @@ from typing import Annotated, TYPE_CHECKING
 import strawberry
 import strawberry_django
 from strawberry import ID
-from strawberry_django import FilterLookup
+from strawberry_django import StrFilterLookup
 
 from netbox.graphql.filters import NetBoxModelFilter
 
@@ -19,10 +19,10 @@ __all__ = (
 
 @strawberry_django.filter_type(models.SSHKey, lookups=True)
 class SSHKeyFilter(NetBoxModelFilter):
-    name: FilterLookup[str] | None = strawberry_django.filter_field()
-    key_type: FilterLookup[str] | None = strawberry_django.filter_field()
-    public_key: FilterLookup[str] | None = strawberry_django.filter_field()
-    fingerprint: FilterLookup[str] | None = strawberry_django.filter_field()
+    name: StrFilterLookup | None = strawberry_django.filter_field()
+    key_type: StrFilterLookup | None = strawberry_django.filter_field()
+    public_key: StrFilterLookup | None = strawberry_django.filter_field()
+    fingerprint: StrFilterLookup | None = strawberry_django.filter_field()
     tenant: Annotated['TenantFilter', strawberry.lazy('tenancy.graphql.filters')] | None = (
         strawberry_django.filter_field()
     )
