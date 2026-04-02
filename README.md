@@ -84,6 +84,8 @@ Clone the repository and install in editable mode inside your NetBox development
 ```bash
 git clone https://github.com/deovero/netbox-ssh-keys.git
 cd netbox-ssh-keys
+python3.14 -m venv .venv
+source .venv/bin/activate
 pip install -e .
 
 # Generate/update migrations (from within NetBox)
