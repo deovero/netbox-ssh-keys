@@ -79,13 +79,26 @@ The `public_key` field is included in `brief_fields`, allowing SSH keys to be re
 
 ## Development
 
+Clone the repository and install in editable mode inside your NetBox development environment:
+
 ```bash
 git clone https://github.com/deovero/netbox-ssh-keys.git
 cd netbox-ssh-keys
 pip install -e .
 
 # Generate/update migrations (from within NetBox)
-cd /opt/netbox/netbox
+cd /path/to/netbox/netbox
 python manage.py makemigrations netbox_ssh_keys
 python manage.py migrate netbox_ssh_keys
 ```
+
+Enable the local Git hook so the patch version in `pyproject.toml` is automatically bumped on commit when unchanged from `HEAD`:
+
+```bash
+git config core.hooksPath .githooks
+chmod +x .githooks/pre-commit scripts/bump_pyproject_version.py
+
+## License
+
+Apache 2.0 — see [LICENSE](LICENSE).
+
