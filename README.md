@@ -77,6 +77,35 @@ The `public_key` field is included in `brief_fields`, allowing SSH keys to be re
 > The 1023-character limit comfortably accommodates RSA-4096 (≈716 chars), ECDSA (≈140–232 chars),
 > and Ed25519 (≈68 chars) keys. RSA-8192 keys (≈1392 chars) are **not** supported.
 
+### GraphQL Query
+
+Example of a GraphQL query to receive one tenant's SSH keys
+
+Query
+
+```graphql
+query tenant_sshkeys($tenantSlug:String!) {
+  ssh_key_list(
+    filters: {
+      tenant: {
+        slug: { exact: $tenantSlug }
+      }
+    }
+  ) {
+    public_key
+    name
+  }
+}
+```
+
+Variables:
+```json
+{
+  "tenantSlug": "cust_somename"
+}
+```
+
+
 ## Development
 
 Clone the repository and install in editable mode inside your NetBox development environment:
