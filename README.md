@@ -100,8 +100,8 @@ query tenant_sshkeys($tenantSlug:String!) {
 Query a flat list
 
 ```graphql
-query tenant_sshkeys($tenantSlug:String!) {
-  ssh_key_authorized_keys_lines(tenantSlug: $tenantSlug)
+query tenant_sshkeys_flat($tenantSlug:String!) {
+  ssh_key_authorized_keys_lines(tenant_slug: $tenantSlug)
 }
 ```
 
