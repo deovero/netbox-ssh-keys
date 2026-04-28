@@ -77,11 +77,9 @@ The `public_key` field is included in `brief_fields`, allowing SSH keys to be re
 > The 1023-character limit comfortably accommodates RSA-4096 (≈716 chars), ECDSA (≈140–232 chars),
 > and Ed25519 (≈68 chars) keys. RSA-8192 keys (≈1392 chars) are **not** supported.
 
-### GraphQL Query
+### GraphQL Queries
 
-Example of a GraphQL query to receive one tenant's SSH keys
-
-Query
+Query properties
 
 ```graphql
 query tenant_sshkeys($tenantSlug:String!) {
@@ -94,7 +92,16 @@ query tenant_sshkeys($tenantSlug:String!) {
   ) {
     public_key
     name
+    authorized_keys_line
   }
+}
+```
+
+Query a flat list
+
+```graphql
+query tenant_sshkeys($tenantSlug:String!) {
+  ssh_key_authorized_keys_lines(tenantSlug: $tenantSlug)
 }
 ```
 
