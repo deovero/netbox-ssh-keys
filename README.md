@@ -134,7 +134,7 @@ Enable the local Git hook so the patch version in `pyproject.toml` is automatica
 
 ```bash
 git config core.hooksPath .githooks
-chmod +x .githooks/pre-commit scripts/bump_pyproject_version.py
+chmod +x .githooks/pre-commit scripts/bump_version.py
 
 ## License
 
