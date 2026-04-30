@@ -1,35 +1,26 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+# Pre-commit hook: runs unit tests then integration tests + bump version
+# Install with:  git  config  core.hooksPath  .githooks
 
 set -eu
 
-PYPROJECT="pyproject.toml"
-
-if [ ! -f "$PYPROJECT" ]; then
-    exit 0
-fi
+echo "=== Bump version ==="
 
 # Skip on first commit where HEAD does not exist yet.
 if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
     exit 0
 fi
 
-head_version="$(git show HEAD:"$PYPROJECT" | sed -n 's/^version = "\([0-9][0-9.]*\)"$/\1/p' | head -n 1)"
-current_version="$(sed -n 's/^version = "\([0-9][0-9.]*\)"$/\1/p' "$PYPROJECT" | head -n 1)"
+head_version="$(git show HEAD:"pyproject.toml" | sed -n 's/^version = "\([0-9][0-9.]*\)"$/\1/p' | head -n 1)"
+current_version="$(sed -n 's/^version = "\([0-9][0-9.]*\)"$/\1/p' "pyproject.toml" | head -n 1)"
 
 if [ -z "$head_version" ] || [ -z "$current_version" ]; then
     exit 0
 fi
 
 if [ "$current_version" = "$head_version" ]; then
-    python3 scripts/bump_pyproject_version.py "$PYPROJECT" >/dev/null
-    git add "$PYPROJECT"
-    echo "Bumped $PYPROJECT version from $head_version" >&2
-fi
-
-# Sync the (possibly just-bumped) version into PluginConfig in __init__.py
-INIT="netbox_ssh_keys/__init__.py"
-new_version="$(sed -n 's/^version = "\([0-9][0-9.]*\)"$/\1/p' "$PYPROJECT" | head -n 1)"
-if [ -n "$new_version" ] && [ -f "$INIT" ]; then
-    sed -i '' "s/^\( *version = \)'[0-9][0-9.]*'/\1'${new_version}'/" "$INIT"
-    git add "$INIT"
+    python3 scripts/bump_version.py
+    git add "pyproject.toml"
+    git add "*/__init__.py"
+    echo "Bumped project version from $head_version" >&2
 fi
