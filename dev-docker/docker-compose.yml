@@ -1,0 +1,101 @@
+# Test stack for the netbox-ssh-keys plugin.
+#
+# Usage:
+#   docker compose up -d --build
+#
+# NetBox will be available at http://localhost:8000
+# Default credentials: admin / admin (API token in docker/env/netbox.env)
+
+x-netbox-build: &netbox-build
+  build:
+    context: ..
+    dockerfile: dev-docker/Dockerfile
+  image: netbox-ssh-keys:dev
+  env_file: env/netbox.env
+  volumes:
+    - ./plugins.py:/etc/netbox/config/plugins.py:ro
+    - netbox-media-files:/opt/netbox/netbox/media
+    - netbox-reports-files:/opt/netbox/netbox/reports
+    - netbox-scripts-files:/opt/netbox/netbox/scripts
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_started
+    redis-cache:
+      condition: service_started
+
+services:
+  netbox:
+    <<: *netbox-build
+    ports:
+      - "8000:8080"
+    healthcheck:
+      test: curl -f http://localhost:8080/login/ || exit 1
+      start_period: 90s
+      timeout: 3s
+      interval: 15s
+
+  netbox-worker:
+    <<: *netbox-build
+    depends_on:
+      netbox:
+        condition: service_started
+    command:
+      - python
+      - /opt/netbox/netbox/manage.py
+      - rqworker
+    healthcheck:
+      test: ps -aux | grep -v grep | grep -q rqworker || exit 1
+      start_period: 40s
+      timeout: 3s
+      interval: 15s
+
+  netbox-housekeeping:
+    <<: *netbox-build
+    depends_on:
+      netbox:
+        condition: service_started
+    command:
+      - /opt/netbox/housekeeping.sh
+    healthcheck:
+      test: ps -aux | grep -v grep | grep -q housekeeping || exit 1
+      start_period: 40s
+      timeout: 3s
+      interval: 15s
+
+  postgres:
+    image: postgres:16-alpine
+    env_file: env/postgres.env
+    volumes:
+      - netbox-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command:
+      - sh
+      - -c
+      - redis-server --appendonly yes --requirepass $$REDIS_PASSWORD
+    env_file: env/redis.env
+    volumes:
+      - netbox-redis-data:/data
+
+  redis-cache:
+    image: redis:7-alpine
+    command:
+      - sh
+      - -c
+      - redis-server --requirepass $$REDIS_PASSWORD
+    env_file: env/redis.env
+
+volumes:
+  netbox-media-files:
+  netbox-postgres-data:
+  netbox-redis-data:
+  netbox-reports-files:
+  netbox-scripts-files:

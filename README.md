@@ -135,6 +135,16 @@ Enable the local Git hook so the patch version in `pyproject.toml` is automatica
 ```bash
 git config core.hooksPath .githooks
 chmod +x .githooks/pre-commit scripts/bump_version.py
+```
+
+## Testing in Docker
+
+```
+docker compose -f dev-docker/docker-compose.yml down
+docker compose -f dev-docker/docker-compose.yml up --detach
+```
+
+If everything works Netbox should now be running on http://localhost:8000
 
 ## License
 
