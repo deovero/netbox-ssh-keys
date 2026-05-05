@@ -21,9 +21,9 @@ x-netbox-build: &netbox-build
     postgres:
       condition: service_healthy
     redis:
-      condition: service_started
+      condition: service_healthy
     redis-cache:
-      condition: service_started
+      condition: service_healthy
 
 services:
   netbox:
@@ -80,18 +80,28 @@ services:
     command:
       - sh
       - -c
-      - redis-server --appendonly yes --requirepass $$REDIS_PASSWORD
+      - redis-server --appendonly yes $${REDIS_PASSWORD:+--requirepass "$$REDIS_PASSWORD"}
     env_file: env/redis.env
     volumes:
       - netbox-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   redis-cache:
     image: redis:7-alpine
     command:
       - sh
       - -c
-      - redis-server --requirepass $$REDIS_PASSWORD
+      - redis-server $${REDIS_PASSWORD:+--requirepass "$$REDIS_PASSWORD"}
     env_file: env/redis.env
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 volumes:
   netbox-media-files:

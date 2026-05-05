@@ -141,7 +141,7 @@ chmod +x .githooks/pre-commit scripts/bump_version.py
 
 ```
 docker compose -f dev-docker/docker-compose.yml down
-docker compose -f dev-docker/docker-compose.yml up --detach
+docker compose -f dev-docker/docker-compose.yml up --detach --build
 ```
 
 If everything works Netbox should now be running on http://localhost:8000
