@@ -1,6 +1,6 @@
 # Extends the official NetBox image with the netbox-ssh-keys plugin
 # installed from the local source tree.
-ARG NETBOX_VERSION=v4.5
+ARG NETBOX_VERSION=v4.6
 FROM netboxcommunity/netbox:${NETBOX_VERSION}
 
 USER root
