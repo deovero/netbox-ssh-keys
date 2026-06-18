@@ -177,7 +177,7 @@ chmod +x .githooks/pre-commit scripts/bump_version.py
 
 ## Testing in Docker
 
-```
+```bash
 docker compose -f dev-docker/docker-compose.yml down --volumes --remove-orphans --rmi all
 docker compose -f dev-docker/docker-compose.yml up --detach --build
 ```

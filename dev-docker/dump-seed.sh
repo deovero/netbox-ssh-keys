@@ -14,7 +14,7 @@ set -euo pipefail
 # Resolve paths relative to this script so it works from any cwd.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPOSE_FILE="${SCRIPT_DIR}/docker-compose.yml"
-SEED_FILE="${SCRIPT_DIR}/seed/netbox-seed.sql.gz"
+SEED_FILE="${SCRIPT_DIR}/seed/netbox-seed.sql"
 
 mkdir -p "${SCRIPT_DIR}/seed"
 
