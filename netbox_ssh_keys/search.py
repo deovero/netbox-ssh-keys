@@ -9,6 +9,6 @@ class SSHKeyIndex(SearchIndex):
     fields = (
         ('name', 100),
         ('fingerprint', 80),
-        ('public_key', 60),
+        ('authorized_keys_line', 60),
         ('description', 50),
     )
