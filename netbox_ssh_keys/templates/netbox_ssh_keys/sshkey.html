@@ -37,6 +37,16 @@
           </td>
         </tr>
         <tr>
+          <th scope="row">Device Role</th>
+          <td>
+            {% if object.device_role %}
+              <a href="{{ object.device_role.get_absolute_url }}">{{ object.device_role }}</a>
+            {% else %}
+              {{ ''|placeholder }}
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
           <th scope="row">Description</th>
           <td>{{ object.description|placeholder }}</td>
         </tr>

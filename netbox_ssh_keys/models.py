@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 
@@ -35,12 +36,19 @@ class SSHKey(NetBoxModel):
         blank=True,
         null=True,
     )
+    device_role = models.ForeignKey(
+        to='dcim.DeviceRole',
+        on_delete=models.PROTECT,
+        related_name='ssh_keys',
+        blank=True,
+        null=True,
+    )
     description = models.CharField(
         max_length=200,
         blank=True,
     )
 
-    clone_fields = ('key_type', 'tenant')
+    clone_fields = ('key_type', 'tenant', 'device_role')
 
     class Meta:
         ordering = ['name']
@@ -50,6 +58,10 @@ class SSHKey(NetBoxModel):
             models.UniqueConstraint(
                 fields=['fingerprint', 'tenant'],
                 name='unique_fingerprint_per_tenant',
+            ),
+            models.UniqueConstraint(
+                fields=['fingerprint', 'device_role'],
+                name='unique_fingerprint_per_device_role',
             ),
         ]
 
@@ -61,6 +73,10 @@ class SSHKey(NetBoxModel):
 
     def clean(self):
         super().clean()
+        if self.tenant and self.device_role:
+            raise ValidationError(
+                'An SSH key cannot be assigned to both a tenant and a device role.'
+            )
         if self.public_key:
             self.fingerprint = calculate_fingerprint(self.public_key)
 

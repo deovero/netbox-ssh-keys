@@ -10,12 +10,13 @@ class SSHKeyTable(NetBoxTable):
     key_type = tables.Column(verbose_name='Type')
     fingerprint = tables.Column()
     tenant = tables.Column(linkify=True)
+    device_role = tables.Column(linkify=True)
     tags = columns.TagColumn(url_name='plugins:netbox_ssh_keys:sshkey_list')
 
     class Meta(NetBoxTable.Meta):
         model = SSHKey
         fields = (
             'pk', 'id', 'name', 'key_type', 'fingerprint',
-            'tenant', 'description', 'tags', 'created', 'last_updated',
+            'tenant', 'device_role', 'description', 'tags', 'created', 'last_updated',
         )
-        default_columns = ('name', 'key_type', 'fingerprint', 'tenant', 'tags')
+        default_columns = ('name', 'key_type', 'fingerprint', 'tenant', 'device_role', 'tags')

@@ -9,6 +9,7 @@ from netbox.forms import (
     NetBoxModelForm,
     NetBoxModelImportForm,
 )
+from dcim.models import DeviceRole
 from tenancy.models import Tenant
 from utilities.forms.fields import DynamicModelChoiceField, TagFilterField
 from utilities.forms.rendering import FieldSet
@@ -26,11 +27,15 @@ class SSHKeyForm(NetBoxModelForm):
         queryset=Tenant.objects.all(),
         required=False,
     )
+    device_role = DynamicModelChoiceField(
+        queryset=DeviceRole.objects.all(),
+        required=False,
+    )
 
     fieldsets = (
         FieldSet(
             'name', 'key_type', 'public_key',
-            'tenant', 'description', 'tags',
+            'tenant', 'device_role', 'description', 'tags',
             name='SSH Key',
         ),
     )
@@ -39,7 +44,7 @@ class SSHKeyForm(NetBoxModelForm):
         model = SSHKey
         fields = [
             'name', 'key_type', 'public_key',
-            'tenant', 'description', 'tags',
+            'tenant', 'device_role', 'description', 'tags',
         ]
         widgets = {
             'public_key': forms.Textarea(attrs={
@@ -79,12 +84,20 @@ class SSHKeyForm(NetBoxModelForm):
         if hasattr(self, '_parsed_name'):
             if not self.cleaned_data.get('name'):
                 self.cleaned_data['name'] = self._parsed_name
+        if self.cleaned_data.get('tenant') and self.cleaned_data.get('device_role'):
+            raise ValidationError(
+                'An SSH key cannot be assigned to both a tenant and a device role.'
+            )
         return self.cleaned_data
 
 
 class SSHKeyBulkEditForm(NetBoxModelBulkEditForm):
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
+        required=False,
+    )
+    device_role = DynamicModelChoiceField(
+        queryset=DeviceRole.objects.all(),
         required=False,
     )
     description = forms.CharField(
@@ -94,9 +107,9 @@ class SSHKeyBulkEditForm(NetBoxModelBulkEditForm):
 
     model = SSHKey
     fieldsets = (
-        FieldSet('tenant', 'description'),
+        FieldSet('tenant', 'device_role', 'description'),
     )
-    nullable_fields = ('tenant', 'description')
+    nullable_fields = ('tenant', 'device_role', 'description')
 
 
 class SSHKeyImportForm(NetBoxModelImportForm):
@@ -105,17 +118,22 @@ class SSHKeyImportForm(NetBoxModelImportForm):
         to_field_name='name',
         required=False,
     )
+    device_role = forms.ModelChoiceField(
+        queryset=DeviceRole.objects.all(),
+        to_field_name='name',
+        required=False,
+    )
 
     class Meta:
         model = SSHKey
-        fields = ['name', 'key_type', 'public_key', 'tenant', 'description']
+        fields = ['name', 'key_type', 'public_key', 'tenant', 'device_role', 'description']
 
 
 class SSHKeyFilterForm(NetBoxModelFilterSetForm):
     model = SSHKey
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('key_type', 'tenant_id', 'fingerprint', name='Filters'),
+        FieldSet('key_type', 'tenant_id', 'device_role_id', 'fingerprint', name='Filters'),
     )
     key_type = forms.MultipleChoiceField(
         choices=SSHKeyTypeChoices,
@@ -125,6 +143,11 @@ class SSHKeyFilterForm(NetBoxModelFilterSetForm):
         queryset=Tenant.objects.all(),
         required=False,
         label='Tenant',
+    )
+    device_role_id = DynamicModelChoiceField(
+        queryset=DeviceRole.objects.all(),
+        required=False,
+        label='Device role',
     )
     fingerprint = forms.CharField(
         required=False,
@@ -151,3 +174,16 @@ class SSHKeyBulkAuthorizedKeysForm(forms.Form):
         required=False,
         help_text='Optionally assign all imported keys to a tenant.',
     )
+    device_role = forms.ModelChoiceField(
+        queryset=DeviceRole.objects.all(),
+        required=False,
+        help_text='Optionally assign all imported keys to a device role.',
+    )
+
+    def clean(self):
+        super().clean()
+        if self.cleaned_data.get('tenant') and self.cleaned_data.get('device_role'):
+            raise ValidationError(
+                'An SSH key cannot be assigned to both a tenant and a device role.'
+            )
+        return self.cleaned_data

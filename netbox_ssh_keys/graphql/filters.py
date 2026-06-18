@@ -10,6 +10,7 @@ from netbox.graphql.filters import NetBoxModelFilter
 from netbox_ssh_keys import models
 
 if TYPE_CHECKING:
+    from dcim.graphql.filters import DeviceRoleFilter
     from tenancy.graphql.filters import TenantFilter
 
 __all__ = (
@@ -27,3 +28,7 @@ class SSHKeyFilter(NetBoxModelFilter):
         strawberry_django.filter_field()
     )
     tenant_id: ID | None = strawberry_django.filter_field()
+    device_role: Annotated['DeviceRoleFilter', strawberry.lazy('dcim.graphql.filters')] | None = (
+        strawberry_django.filter_field()
+    )
+    device_role_id: ID | None = strawberry_django.filter_field()

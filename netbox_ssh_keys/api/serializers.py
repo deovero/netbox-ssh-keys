@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
+from dcim.api.serializers_.roles import DeviceRoleSerializer
 from tenancy.api.serializers_.tenants import TenantSerializer
 
 from ..models import SSHKey
@@ -12,12 +13,13 @@ class SSHKeySerializer(NetBoxModelSerializer):
     )
     authorized_keys_line = serializers.CharField(read_only=True)
     tenant = TenantSerializer(required=False, allow_null=True, nested=True)
+    device_role = DeviceRoleSerializer(required=False, allow_null=True, nested=True)
 
     class Meta:
         model = SSHKey
         fields = [
             'id', 'url', 'display', 'name', 'key_type', 'public_key',
-            'fingerprint', 'tenant', 'description',
+            'fingerprint', 'tenant', 'device_role', 'description',
             'authorized_keys_line',
             'tags', 'custom_fields', 'created', 'last_updated',
         ]

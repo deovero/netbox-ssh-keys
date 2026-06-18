@@ -21,6 +21,6 @@ mkdir -p "${SCRIPT_DIR}/seed"
 echo "Exporting NetBox database to ${SEED_FILE} ..."
 docker compose -f "${COMPOSE_FILE}" exec -T postgres \
 	pg_dump -U netbox -d netbox --no-owner --no-privileges \
-	| gzip > "${SEED_FILE}"
+	> "${SEED_FILE}"
 
 echo "Done. Seed size: $(du -h "${SEED_FILE}" | cut -f1)"

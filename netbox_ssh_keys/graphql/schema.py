@@ -12,10 +12,16 @@ class SSHKeysQuery:
     ssh_key_list: list[types.SSHKeyType] = strawberry_django.field(filters=SSHKeyFilter, pagination=True)
 
     @strawberry.field(description='Flat list of authorized_keys-formatted lines')
-    def ssh_key_authorized_keys_lines(self, tenant_slug: str | None = None) -> list[str]:
+    def ssh_key_authorized_keys_lines(
+        self,
+        tenant_slug: str | None = None,
+        device_role_slug: str | None = None,
+    ) -> list[str]:
         queryset = models.SSHKey.objects.all().order_by('name')
         if tenant_slug:
             queryset = queryset.filter(tenant__slug=tenant_slug)
+        if device_role_slug:
+            queryset = queryset.filter(device_role__slug=device_role_slug)
         return [ssh_key.authorized_keys_line for ssh_key in queryset]
 
 

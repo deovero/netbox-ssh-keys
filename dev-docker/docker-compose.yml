@@ -6,10 +6,12 @@
 # NetBox will be available at http://localhost:8000
 # Default credentials: admin / admin (API token in docker/env/netbox.env)
 
-x-netbox-build: &netbox-build
-  build:
-    context: ..
-    dockerfile: dev-docker/Dockerfile
+# Shared runtime config. Only the `netbox` service builds the image (see below);
+# the worker/housekeeping services reuse the already-built `netbox-ssh-keys:dev`
+# image. Defining `build` on more than one service that shares the same image tag
+# makes Compose export the same tag in parallel, which fails with
+# `image "...:dev": already exists` on the containerd image store / bake builder.
+x-netbox-common: &netbox-common
   image: netbox-ssh-keys:dev
   env_file: env/netbox.env
   volumes:
@@ -27,7 +29,10 @@ x-netbox-build: &netbox-build
 
 services:
   netbox:
-    <<: *netbox-build
+    <<: *netbox-common
+    build:
+      context: ..
+      dockerfile: dev-docker/Dockerfile
     ports:
       - "8000:8080"
     healthcheck:
@@ -37,7 +42,7 @@ services:
       interval: 15s
 
   netbox-worker:
-    <<: *netbox-build
+    <<: *netbox-common
     depends_on:
       netbox:
         condition: service_started
@@ -52,7 +57,7 @@ services:
       interval: 15s
 
   netbox-housekeeping:
-    <<: *netbox-build
+    <<: *netbox-common
     depends_on:
       netbox:
         condition: service_started

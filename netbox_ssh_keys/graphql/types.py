@@ -9,6 +9,7 @@ from .. import models
 from .filters import SSHKeyFilter
 
 if TYPE_CHECKING:
+    from dcim.graphql.types import DeviceRoleType
     from tenancy.graphql.types import TenantType
 
 __all__ = (
@@ -24,6 +25,7 @@ __all__ = (
 )
 class SSHKeyType(NetBoxObjectType):
     tenant: Annotated['TenantType', strawberry.lazy('tenancy.graphql.types')] | None
+    device_role: Annotated['DeviceRoleType', strawberry.lazy('dcim.graphql.types')] | None
 
     @strawberry.field(description='Full authorized_keys line')
     def authorized_keys_line(self) -> str:

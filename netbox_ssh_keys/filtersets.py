@@ -2,6 +2,7 @@ import django_filters
 from django.db.models import Q
 
 from netbox.filtersets import NetBoxModelFilterSet
+from dcim.models import DeviceRole
 from tenancy.models import Tenant
 
 from .choices import SSHKeyTypeChoices
@@ -26,13 +27,24 @@ class SSHKeyFilterSet(NetBoxModelFilterSet):
         label='Tenant (slug)',
     )
 
+    device_role_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=DeviceRole.objects.all(),
+        label='Device role (ID)',
+    )
+    device_role = django_filters.ModelMultipleChoiceFilter(
+        field_name='device_role__slug',
+        queryset=DeviceRole.objects.all(),
+        to_field_name='slug',
+        label='Device role (slug)',
+    )
+
     public_key = django_filters.CharFilter(
         lookup_expr='exact',
     )
 
     class Meta:
         model = SSHKey
-        fields = ['id', 'name', 'key_type', 'public_key', 'fingerprint', 'tenant_id']
+        fields = ['id', 'name', 'key_type', 'public_key', 'fingerprint', 'tenant_id', 'device_role_id']
 
     def search(self, queryset, name, value):
         if not value.strip():

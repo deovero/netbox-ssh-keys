@@ -92,6 +92,7 @@ class SSHKeyBulkAuthorizedKeysView(View):
             return render(request, self.template_name, {'form': form})
 
         tenant = form.cleaned_data.get('tenant')
+        device_role = form.cleaned_data.get('device_role')
         lines = form.cleaned_data['authorized_keys'].splitlines()
         created = []
         errors = []
@@ -108,6 +109,7 @@ class SSHKeyBulkAuthorizedKeysView(View):
                     key_type=parsed['key_type'],
                     public_key=parsed['public_key'],
                     tenant=tenant,
+                    device_role=device_role,
                 )
                 key.full_clean()
                 key.save()
