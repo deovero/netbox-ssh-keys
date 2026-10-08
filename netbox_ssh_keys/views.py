@@ -34,7 +34,20 @@ class SSHKeyListView(generic.ObjectListView):
 class SSHKeyView(generic.ObjectView):
     queryset = SSHKey.objects.all()
 
-
+    def get_extra_context(self, request, instance):
+        # The same key material is stored once per tenant / device role, so
+        # gather all keys sharing this fingerprint to show where it is used.
+        related_keys = SSHKey.objects.restrict(request.user, 'view').filter(
+            fingerprint=instance.fingerprint,
+        ).select_related('tenant', 'device_role')
+        return {
+            'tenant_keys': sorted(
+                (k for k in related_keys if k.tenant), key=lambda k: str(k.tenant)
+            ),
+            'device_role_keys': sorted(
+                (k for k in related_keys if k.device_role), key=lambda k: str(k.device_role)
+            ),
+        }
 
 
 @register_model_view(SSHKey, 'add', detail=False)

@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Docker: Start",
+      "detail": "Build and start the NetBox dev stack (http://localhost:8000, admin/admin)",
+      "type": "shell",
+      "command": "docker compose -f dev-docker/docker-compose.yml up --detach --build",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Stop",
+      "detail": "Stop the dev stack, keeping volumes and images",
+      "type": "shell",
+      "command": "docker compose -f dev-docker/docker-compose.yml down --remove-orphans",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Teardown",
+      "detail": "Stop the dev stack and remove its volumes and images",
+      "type": "shell",
+      "command": "docker compose -f dev-docker/docker-compose.yml down --volumes --remove-orphans --rmi all",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Rebuild from scratch",
+      "detail": "Teardown, then start fresh (re-seeds the database)",
+      "dependsOn": ["Docker: Teardown", "Docker: Start"],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Logs",
+      "detail": "Follow logs of the netbox service",
+      "type": "shell",
+      "command": "docker compose -f dev-docker/docker-compose.yml logs --follow netbox",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}
