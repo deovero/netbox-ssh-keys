@@ -64,53 +64,5 @@
     {% include 'inc/panels/custom_fields.html' %}
   </div>
 </div>
-<div class="row mb-3">
-  <div class="col col-md-6">
-    <div class="card">
-      <h5 class="card-header">Tenants</h5>
-      {% if tenant_keys %}
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>Tenant</th>
-              <th>SSH Key</th>
-            </tr>
-          </thead>
-          {% for key in tenant_keys %}
-            <tr{% if key.pk == object.pk %} class="table-active"{% endif %}>
-              <td><a href="{{ key.tenant.get_absolute_url }}">{{ key.tenant }}</a></td>
-              <td><a href="{{ key.get_absolute_url }}">{{ key.name }}</a></td>
-            </tr>
-          {% endfor %}
-        </table>
-      {% else %}
-        <div class="card-body text-muted">None</div>
-      {% endif %}
-    </div>
-  </div>
-  <div class="col col-md-6">
-    <div class="card">
-      <h5 class="card-header">Device Roles</h5>
-      {% if device_role_keys %}
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>Device Role</th>
-              <th>SSH Key</th>
-            </tr>
-          </thead>
-          {% for key in device_role_keys %}
-            <tr{% if key.pk == object.pk %} class="table-active"{% endif %}>
-              <td><a href="{{ key.device_role.get_absolute_url }}">{{ key.device_role }}</a></td>
-              <td><a href="{{ key.get_absolute_url }}">{{ key.name }}</a></td>
-            </tr>
-          {% endfor %}
-        </table>
-      {% else %}
-        <div class="card-body text-muted">None</div>
-      {% endif %}
-    </div>
-  </div>
-</div>
 
 {% endblock content %}
